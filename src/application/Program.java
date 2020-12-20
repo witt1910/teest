@@ -1,53 +1,56 @@
 package application;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-import model.entities.Rectangle;
-import model.entities.Shape;
-import model.entities.Square;
-import model.enums.Color;
+import model.entities.Company;
+import model.entities.Individual;
+import model.entities.TaxPayer;
 
 public class Program {
 
-	public static void main(String[] args) throws ParseException {
-
+	public static void main(String[] args) {
 
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
 
-		System.out.print("Enter the number of shapes: ");
+		List<TaxPayer> list = new ArrayList<>();
+		
+		System.out.print("Enter the number of tax payers: ");
 		int no = sc.nextInt();
 		
-		List<Shape> list = new ArrayList<>();
-		
 		for(int i = 1; i <= no; i++) {
-			System.out.println("Shape #" + i + " data:");
-			System.out.print("Rectangle or square (r/s)? ");
+			System.out.println("Tax payer #" + i + " data:");
+			System.out.print("Individual or company (i/c)? ");
 			char op = sc.next().charAt(0);
-			System.out.print("Color (BLACK/BLUE/RED)? ");
-			Color color = Color.valueOf(sc.next());
-			if(op == 's') {
-				System.out.print("Sides: ");
-				double side = sc.nextDouble();
-				list.add(new Square(side));
+			System.out.print("Name: ");
+			sc.nextLine();
+			String name = sc.nextLine();
+			System.out.print("Anual income: ");
+			double anualIncome = sc.nextDouble();
+			if(op == 'c') {
+				System.out.print("Number of employees: ");
+				int nEmp = sc.nextInt();
+				list.add(new Company(name, anualIncome, nEmp));
 			} else {
-				System.out.print("Width: ");
-				double width = sc.nextDouble();
-				System.out.print("Height: ");
-				double height = sc.nextDouble();
-				list.add(new Rectangle(width, height));
+				System.out.print("Health expenditures: ");
+				double hExp = sc.nextDouble();
+				list.add(new Individual(name, anualIncome, hExp));
 			}
 		}
-		
-		System.out.println("\n\nSHAPE AREAS:");
-		for(Shape sp : list) {
-			System.out.println(sp.area());
-		}
 
+		double sum = 0;
+		System.out.println("\n\nTAXES PAID:");
+		for(TaxPayer tp : list) {
+			System.out.println(tp.getName() + ": $ "
+				+ String.format("%.2f", tp.tax()));
+			sum += tp.tax();
+		}
+		
+		System.out.printf("%nTOTAL TAXES: $ %.2f", sum);
+		
 		sc.close();
 	}
 }
