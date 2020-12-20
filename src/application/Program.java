@@ -1,56 +1,48 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
-import model.entities.Company;
-import model.entities.Individual;
-import model.entities.TaxPayer;
+import model.entities.Reservation;
+import model.exceptions.DomainException;
 
 public class Program {
 
 	public static void main(String[] args) {
 
-		Locale.setDefault(Locale.US);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
 		Scanner sc = new Scanner(System.in);
 
-		List<TaxPayer> list = new ArrayList<>();
-		
-		System.out.print("Enter the number of tax payers: ");
-		int no = sc.nextInt();
-		
-		for(int i = 1; i <= no; i++) {
-			System.out.println("Tax payer #" + i + " data:");
-			System.out.print("Individual or company (i/c)? ");
-			char op = sc.next().charAt(0);
-			System.out.print("Name: ");
-			sc.nextLine();
-			String name = sc.nextLine();
-			System.out.print("Anual income: ");
-			double anualIncome = sc.nextDouble();
-			if(op == 'c') {
-				System.out.print("Number of employees: ");
-				int nEmp = sc.nextInt();
-				list.add(new Company(name, anualIncome, nEmp));
-			} else {
-				System.out.print("Health expenditures: ");
-				double hExp = sc.nextDouble();
-				list.add(new Individual(name, anualIncome, hExp));
-			}
-		}
+		try {
+			System.out.print("Room number: ");
+			int room = sc.nextInt();
+			System.out.print("Check-in: ");
+			Date checkin = sdf.parse(sc.next());
+			System.out.print("Check-out: ");
+			Date checkout = sdf.parse(sc.next());
 
-		double sum = 0;
-		System.out.println("\n\nTAXES PAID:");
-		for(TaxPayer tp : list) {
-			System.out.println(tp.getName() + ": $ "
-				+ String.format("%.2f", tp.tax()));
-			sum += tp.tax();
+			Reservation reservation = new Reservation(room, checkin, checkout);
+			System.out.println("Reservation " + reservation);
+
+			System.out.println("\nEnter data to update the reservation:");
+			System.out.print("Check-in date: ");
+			checkin = sdf.parse(sc.next());
+			System.out.print("Check-out date: ");
+			checkout = sdf.parse(sc.next());
+
+			reservation.updateDates(checkin, checkout);
+			System.out.println("Reservation " + reservation);
+		} catch (ParseException e) {
+			System.out.println("Invalid date format.");
+		} catch (DomainException e) {
+			System.out.println("Error in reservation: " + e.getMessage());
+		} catch (RuntimeException e) {
+			System.out.println("Unexpected error.");
+		} finally {
+			sc.close();
 		}
-		
-		System.out.printf("%nTOTAL TAXES: $ %.2f", sum);
-		
-		sc.close();
 	}
 }
